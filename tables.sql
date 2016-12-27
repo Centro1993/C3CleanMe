@@ -1,1 +1,2 @@
 CREATE TABLE `Restrooms` (   `id` int(10) NOT NULL UNIQUE,   `name` varchar(128) NOT NULL UNIQUE);
+CREATE TABLE `Ratings` (id int(10) NOT NULL UNIQUE PRIMARY KEY, r_id int(10) NOT NULL,  timestamp int(128) NOT NULL, rating tinyint(1) NOT NULL, FOREIGN KEY (r_id) REFERENCES Restrooms(id));
