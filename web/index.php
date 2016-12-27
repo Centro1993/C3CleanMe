@@ -27,10 +27,10 @@ $app->get('/', function(Silex\Application $app) {
 
 //route for rating toilet
 $app->get('/{id}', function (Silex\Application $app, $id) {
+    $db = db();
+    $bathroom = $db->query('SELECT * FROM Restrooms WHERE id = '.$id.' INNER JOIN Ratings ON Restrooms.id=Ratings.r_id;');
 
-    $bathroom = $id;
-
-    return $app['twig']->render('rate.twig', array(
+    return $app['twig']->render('single.twig', array(
         'bathroom' => $bathroom,
     ));
 })->assert('id', '\d+');
