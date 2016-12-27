@@ -1,0 +1,13 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+Thank you for voting!
+
+{% if satisfied == 1 %}
+    We are happy that you liked our performance.
+{% else %}
+        We are sorry. We will try harder ...
+{% endif %}
+
+Please visit us again.
+{% endblock  %}
