@@ -10,6 +10,7 @@
     }
   ],
   "require": {
-    "silex/silex": "2.1.x-dev"
+    "silex/silex": "2.1.x-dev",
+    "twig/twig": "^1.30"
   }
 }
