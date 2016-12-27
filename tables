@@ -1,0 +1,1 @@
+CREATE TABLE `Restrooms` (   `id` int(10) NOT NULL UNIQUE,   `name` varchar(128) NOT NULL UNIQUE);
