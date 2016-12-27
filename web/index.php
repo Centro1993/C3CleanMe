@@ -39,7 +39,8 @@ $app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) {
 
     $bathroom = $id;
 
-    $db->query('INSERT INTO Ratings (id, r_id, rating) VALUES ("", '.$id.', '.$req->rating.';)');
+    $db = db();
+    $db->query('INSERT INTO Ratings (id, r_id, rating) VALUES ("", ' . $id . ', ' . $satisfied . ';)');
 
     return $app['twig']->render(
         'thanks.twig',
