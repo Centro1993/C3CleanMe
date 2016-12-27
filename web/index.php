@@ -27,12 +27,6 @@ $app->get('/rate/{id}', function (Silex\Application $app, $id) {
     ));
 })->assert('id', '\d+');
 
-$app->get('/blog/{id}', function ($id) {
-    // ...
-})
-    ->assert('id', '\d+');
-
-
 //start server
 $app->run();
 
