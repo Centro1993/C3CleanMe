@@ -20,13 +20,13 @@ $app['debug'] = true;
 $app->get('/', function(Silex\Application $app) {
     $db = db();
 
-    $restrooms = $db->query('SELECT * FROM Restrooms;');
+    $restrooms = $db->query('SELECT * FROM Restrooms INNER JOIN Ratings ON Restrooms.id=Ratings.r_id;');
 
     return $app['twig']->render('list.twig', ['restrooms' => $restrooms]);
 });
 
 //route for rating toilet
-$app->get('/rate/{id}', function (Silex\Application $app, $id) {
+$app->get('/{id}', function (Silex\Application $app, $id) {
 
     $bathroom = $id;
 
@@ -41,8 +41,7 @@ $app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) {
 
     $db->query('INSERT INTO Ratings (id, r_id, rating) VALUES ("", '.$id.', '.$req->rating.';)');
 
-    return $app['twig']->render('rate.twig', []
-    );
+    return $app->redirect('/'.$id);
 })->assert('id', '\d+');
 
 function db() {
