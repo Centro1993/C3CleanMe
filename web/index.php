@@ -6,6 +6,12 @@ require_once('../config.php');
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+$database = new PDO('mysql:'
+    . 'host=' . $config['db']['hostname'] . ';'
+    . 'dbname=' . $config['db']['database'],
+    $config['db']['username'],
+    $config['db']['password']);
+
 $app = new Silex\Application();
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
@@ -35,10 +41,13 @@ $app->get('/{id}', function (Silex\Application $app, $id) {
     ));
 })->assert('id', '\d+');
 
-$app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) {
+$app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) use ($database) {
 
-    $db = db();
-    $db->query('INSERT INTO Ratings (id, r_id, rating) VALUES (, ' . $id . ', ' . $req->satisfied . ';)');
+    $bathroom = $id;
+
+    $database->query('INSERT INTO
+      Ratings (r_id, timestamp, rating)
+      VALUES (' . $id . ', ' . time() . ', ' . (int)$req->get('satisfied') . ')');
 
     return $app['twig']->render(
         'thanks.twig',
