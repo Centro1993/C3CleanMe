@@ -1,18 +1,21 @@
 <?php
 // web/index.php
-require_once __DIR__.'/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $app = new Silex\Application();
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => __DIR__.'/views',
+    'twig.path' => __DIR__ . '/../views/',
 ));
 
 // ... definitions
 
-$app->run();
-
 $app['debug'] = true;
+
+/*------- ROUTES ---------- */
+$app->get('/', function() {
+    return "wululu";
+});
 
 //route for rating toilet
 $app->get('/rate/{id}', function (Silex\Application $app, $id) {
@@ -23,3 +26,13 @@ $app->get('/rate/{id}', function (Silex\Application $app, $id) {
         'bathroom' => $bathroom,
     ));
 })->assert('id', '\d+');
+
+$app->get('/blog/{id}', function ($id) {
+    // ...
+})
+    ->assert('id', '\d+');
+
+
+//start server
+$app->run();
+
