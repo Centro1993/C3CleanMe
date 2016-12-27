@@ -1,4 +1,9 @@
 <?php
+
+define('DB_NAME', 'cleanme');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 // web/index.php
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -13,8 +18,13 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 $app['debug'] = true;
 
 /*------- ROUTES ---------- */
-$app->get('/', function() {
-    return "wululu";
+$app->get('/', function(Silex\Application $app) {
+    $db = db();
+
+    $row = $db->exec('SELECT * FROM Restrooms;');
+
+
+    return $app['twig']->render('list.twig', ['restrooms' => $restrooms]);
 });
 
 //route for rating toilet
@@ -26,6 +36,11 @@ $app->get('/rate/{id}', function (Silex\Application $app, $id) {
         'bathroom' => $bathroom,
     ));
 })->assert('id', '\d+');
+
+function db() {
+    $db = new PDO('mysql:dbname='.DB_NAME.';host='.DB_HOST, DB_USER, DB_PASS);
+    return $db;
+}
 
 //start server
 $app->run();
