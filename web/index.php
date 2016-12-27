@@ -1,7 +1,7 @@
 <?php
 // web/index.php
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once('config.php');
+require_once('../config.php');
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,10 +38,15 @@ $app->get('/{id}', function (Silex\Application $app, $id) {
 $app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) {
 
     $db = db();
+    $db->query('INSERT INTO Ratings (id, r_id, rating) VALUES (, ' . $id . ', ' . $req->satisfied . ';)');
 
-    $db->query('INSERT INTO Ratings (id, r_id, rating) VALUES ("", '.$id.', '.$req->rating.';)');
-
-    return $app->redirect('/'.$id);
+    return $app['twig']->render(
+        'thanks.twig',
+        [
+            'id' => $id,
+            'satisfied' => $req->satisfied,
+        ]
+    );
 })->assert('id', '\d+');
 
 function db() {
