@@ -1,6 +1,6 @@
 <?php
 // web/index.php
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 $app = new Silex\Application();
 
@@ -15,7 +15,11 @@ $app->run();
 $app['debug'] = true;
 
 //route for rating toilet
-$app->get('/rate/{id}', function (Silex\Application $app, $id) use ($bathrooms) {
+$app->get('/rate/{id}', function (Silex\Application $app, $id) {
 
-    return $output;
+    $bathroom = $id;
+
+    return $app['twig']->render('rate.twig', array(
+        'bathroom' => $bathroom,
+    ));
 })->assert('id', '\d+');
