@@ -1,11 +1,7 @@
 <?php
-
-define('DB_NAME', 'cleanme');
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
 // web/index.php
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once('config.php');
 
 $app = new Silex\Application();
 
@@ -21,8 +17,7 @@ $app['debug'] = true;
 $app->get('/', function(Silex\Application $app) {
     $db = db();
 
-    $row = $db->exec('SELECT * FROM Restrooms;');
-
+    $restrooms = $db->query('SELECT * FROM Restrooms;');
 
     return $app['twig']->render('list.twig', ['restrooms' => $restrooms]);
 });
@@ -35,6 +30,14 @@ $app->get('/rate/{id}', function (Silex\Application $app, $id) {
     return $app['twig']->render('rate.twig', array(
         'bathroom' => $bathroom,
     ));
+})->assert('id', '\d+');
+
+$app->post('/rate/{id}', function (Silex\Application $app, $id) {
+
+    $db = db();
+
+    return $app['twig']->render('rate.twig', []
+    );
 })->assert('id', '\d+');
 
 function db() {
