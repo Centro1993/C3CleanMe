@@ -1,9 +1,10 @@
 {% extends 'layout.twig' %}
 
 {% block content %}
-    <div id="canvas"></div>
+    <div id="container"></div>
     <script>
-        var chartRpm = Highcharts.chart('canvas', {
+        var gaugeOptions = {
+
             chart: {
                 type: 'solidgauge'
             },
@@ -53,28 +54,35 @@
                         useHTML: true
                     }
                 }
-            },
+            }
+        };
+
+
+
+        var chart{{ restroom.id }} = Highcharts.chart('container', Highcharts.merge(gaugeOptions, {
             yAxis: {
                 min: 0,
-                max: 5,
+                max: {{ restroom.total }},
                 title: {
-                    text: 'RPM'
+                    text: '{{ restroom.name }}'
                 }
             },
 
             series: [{
-                name: 'RPM',
+                name: 'Rating',
                 data: [1],
                 dataLabels: {
                     format: '<div style="text-align:center"><span style="font-size:25px;color:' +
                     ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y:.1f}</span><br/>' +
-                    '<span style="font-size:12px;color:silver">* 1000 / min</span></div>'
+                    '<span style="font-size:12px;color:silver">positive/total votes</span></div>'
                 },
                 tooltip: {
-                    valueSuffix: ' revolutions/min'
+                    valueSuffix: ' rating ratio'
                 }
-            }],
+            }]
 
-        });
+        }));
+
+        chart{{ restroom.id }}.series[0].points[0].update({{ restroom.positive }});
     </script>
 {% endblock %}

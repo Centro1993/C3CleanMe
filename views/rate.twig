@@ -1,11 +1,12 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-<form action="/rate/{{ bathroom }}" method="post">
+    Bitte bewerte {{ name }}!
+<form action="/rate/{{ id }}" method="post">
     <input type="hidden" name="satisfied" value="1" />
     <input type="submit" value="(: Zufrieden :)" />
 </form>
-<form action="/rate/{{ bathroom }}" method="post">
+<form action="/rate/{{ id }}" method="post">
     <input type="hidden" name="satisfied" value="0" />
     <input type="submit" value="): nicht zufrieden :(" />
 </form>

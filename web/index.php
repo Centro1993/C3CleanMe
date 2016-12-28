@@ -1,51 +1,63 @@
 <?php
 // web/index.php
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once('../config.php');
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-$database = new PDO('mysql:'
-    . 'host=' . $config['db']['hostname'] . ';'
-    . 'dbname=' . $config['db']['database'],
-    $config['db']['username'],
-    $config['db']['password']);
 
 $app = new Silex\Application();
+
+
+$config = require_once('../config.php');
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__ . '/../views/',
 ));
 
+$db = new PDO('mysql:'
+    . 'host=' . $config['db']['hostname'] . ';'
+    . 'dbname=' . $config['db']['database'],
+    $config['db']['username'],
+    $config['db']['password']);
 // ... definitions
 
 $app['debug'] = true;
 
 /*------- ROUTES ---------- */
-$app->get('/', function(Silex\Application $app) {
-    $db = db();
-
-    $restrooms = $db->query('SELECT * FROM Restrooms INNER JOIN Ratings ON Restrooms.id=Ratings.r_id;');
+$app->get('/', function(Silex\Application $app) use ($db ) {
+    $restrooms = $db->query('SELECT Restrooms.id, Restrooms.name, (SELECT count(Ratings.id) FROM Ratings WHERE Ratings.rating = 1 AND Ratings.r_id=Restrooms.id) as positive, (SELECT count(Ratings.id) FROM Ratings INNER JOIN Restrooms ON Restrooms.id=Ratings.r_id) as total FROM Restrooms;');
 
     return $app['twig']->render('list.twig', ['restrooms' => $restrooms]);
 });
 
-//route for rating toilet
-$app->get('/{id}', function (Silex\Application $app, $id) {
-    $db = db();
-    $bathroom = $db->query('SELECT * FROM Restrooms WHERE id = '.$id.' INNER JOIN Ratings ON Restrooms.id=Ratings.r_id;');
+//route for toilet
+$app->get('/{id}', function (Silex\Application $app, $id) use($db) {
+    $restroom = $db->query('SELECT Restrooms.id, Restrooms.name, (SELECT count(Ratings.id) FROM Ratings WHERE Ratings.rating = 1 AND Ratings.r_id='.$id.') as positive, (SELECT count(Ratings.id) FROM Ratings INNER JOIN Restrooms ON Restrooms.id='.$id.') as total FROM Restrooms WHERE Restrooms.id='.$id);
 
     return $app['twig']->render('single.twig', array(
-        'bathroom' => $bathroom,
+        'restroom' => $restroom->fetch(0),
     ));
 })->assert('id', '\d+');
 
-$app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) use ($database) {
+$app->get('/rate/{id}', function (Request $req, Silex\Application $app, $id) use ($db) {
+
+    $restroom = $db->query('SELECT * FROM Restrooms WHERE id='.$id);
+
+    return $app['twig']->render(
+        'rate.twig',
+        [
+            'name' => $restroom->name,
+            'id'    => $id,
+        ]
+    );
+})->assert('id', '\d+');
+
+$app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) use ($db) {
 
     $bathroom = $id;
 
-    $database->query('INSERT INTO
+    $db->query('INSERT INTO
       Ratings (r_id, timestamp, rating)
       VALUES (' . $id . ', ' . time() . ', ' . (int)$req->get('satisfied') . ')');
 
@@ -57,11 +69,6 @@ $app->post('/rate/{id}', function (Request $req, Silex\Application $app, $id) us
         ]
     );
 })->assert('id', '\d+');
-
-function db() {
-    $db = new PDO('mysql:dbname='.DB_NAME.';host='.DB_HOST, DB_USER, DB_PASS);
-    return $db;
-}
 
 //start server
 $app->run();
